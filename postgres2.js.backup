@@ -1,0 +1,50 @@
+var pg = require('pg');
+var fs = require('fs');
+
+var conString = "postgres://daniels:macquarie@localhost/crawdad";
+var client = new pg.Client(conString);
+
+client.connect(function(err) {
+  if(err) {
+    return console.error('could not connect to postgres', err);
+  }
+
+	// create table unless it already exists
+	client.query("CREATE TABLE IF NOT EXISTS taxi_roma (id smallint, date date, time time, x decimal, y	decimal)");
+		
+	console.log("All fine");
+	// read the file into buffer
+	fs.readFile('taxi_february_1','utf-8',function(err,data){
+		if(err) 		
+			throw err;
+	});
+	console.log("All fine");
+	client.end();
+	console.log("All fine");
+});
+		/*
+		lines.forEach(function(line){
+			var parts = line.split(';');
+
+			if (line){
+				console.log(parts[0]);
+				console.log(parts[1].substring(0,19));
+				var startBracket = parts[2].indexOf('(')+1;
+				var endBracket 	 = parts[2].lastIndexOf(')');
+				console.log(parts[2].substring(startBracket,endBracket));
+			}
+		});
+	*/
+
+
+	/*
+  client.query('SELECT NOW() AS "theTime"', function(err, result) {
+    if(err) {
+      return console.error('error running query', err);
+    }
+    console.log(result.rows[0].theTime);
+    //output: Tue Jan 15 2013 19:12:47 GMT-600 (CST)
+    client.end();
+  });
+	*/
+
