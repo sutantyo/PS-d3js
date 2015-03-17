@@ -1,0 +1,23 @@
+{
+  "name": "PS-d3js",
+  "version": "0.0.1",
+  "description": "Codes for Pluralsight d3.js course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sutantyo/PS-d3js.git"
+  },
+  "author": "Daniel Sutantyo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sutantyo/PS-d3js/issues"
+  },
+  "homepage": "https://github.com/sutantyo/PS-d3js",
+  "dependencies": {
+    "jade": "^1.9.2",
+    "morgan": "^1.5.2"
+  }
+}
