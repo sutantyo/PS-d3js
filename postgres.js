@@ -4,6 +4,7 @@ var fs = require('fs');
 var connectionString = "postgres://daniels:macquarie@localhost/crawdad";
 //var client = new pg.Client(conString);
 
+
 pg.connect(connectionString, function(err,client,done){
   if(err) {
     return console.error('could not connect to postgres', err);
