@@ -1,0 +1,205 @@
+extend layout
+
+block content
+
+	.page-header
+		h1 d3.js Fundamentals 
+			small creating charts
+	.row#chart1(style='background:none; text-align:center;')
+		.col-lg-6		
+			h3 Basic chart
+			script.
+				var w = 300;
+				var h = 100;
+				var padding = 2;
+				var max = 25;
+				var dataset = [5, 10, 15, 20, 25];
+				var svg = d3.select('#chart1').append('svg')
+										.attr('width',w)
+										.attr('height',h)
+										.attr('style','margin: 30px 0px 60px 0px');
+				svg.selectAll('rect')
+					.data(dataset).enter().append('rect')
+					.attr('x',function(d,i){
+						return i * (w / dataset.length);
+						})
+					.attr('y',function(d){
+							return h * (1 - d/max);
+						})
+					.attr('width',w/dataset.length-padding)
+					.attr('height',function(d){
+							return d/max * h;
+						})
+					.attr('fill',function(d){
+							return 'rgb(' + (d*10) + ',' + (d*5) + ',0)';
+						});
+
+				function colorPicker(v){
+					if (v <= 20) { return '#666666'; }
+					else if (v > 20) { return '#FF0033'; }
+				}
+	.row#chart2(style='background:none; text-align:center;')						
+		.col-lg-12		
+			h3 Chart with more features
+			script.
+
+				var w = 300;
+				var h = 100;
+				var padding = 2;
+				var max = 50;
+				var dataset = [50, 8, 15, 20, 40, 12, 10,32,28];
+				var svg = d3.select('#chart2').append('svg')
+										.attr('width',w)
+										.attr('height',h)
+										.attr('style','margin: 30px 0px 60px 0px');
+				svg.selectAll('rect')
+					.data(dataset).enter().append('rect')
+					.attr({
+						x: 			function(d,i) {return i*(w/dataset.length);},
+						y: 			function(d,i) {return h * (1 - d/max);},
+						width: 	w/dataset.length-padding,
+						height: function(d) {return d/max*h;},
+						fill: 	function(d) {return colorPicker(d);}
+					});
+				svg.selectAll('text')
+					.data(dataset).enter().append('text')
+					.text(function(d) { return d; })
+					.attr({
+						'text-anchor': 'middle',
+						x:	function(d,i) {return i*(w/dataset.length) + (w/dataset.length-padding)/2;},
+						y:	function(d) { return h * (1-d/max) + 14;},
+						'font-family': 'sans-serif',
+						'font-size': 12,
+						'fill': 'white'
+
+					});
+
+
+	.row#chart3(style='background:none; text-align:center;')						
+		.col-lg-12
+			h3 Line chart
+			script.
+				var h = 300;
+				var w = 500;
+
+				monthlySales = [
+					{'month':10, 'sales':100},
+					{'month':20, 'sales':134},
+					{'month':30, 'sales':250},
+					{'month':40, 'sales':300},
+					{'month':50, 'sales':215},
+					{'month':60, 'sales':222},
+					{'month':70, 'sales':90},
+					{'month':80, 'sales':60},
+					{'month':90, 'sales':235},
+					{'month':100, 'sales':75}
+				];
+
+
+				var svg =
+					d3.select('#chart3').append('svg')
+					.attr('style','margin: 30px 0px 60px 0px')
+					.attr({
+						width:w,
+						height:h
+					});
+
+
+				// Line drawing function and the svg
+				var lineFun = d3.svg.line()
+											.x(function(d) { return d.month*4; })
+											.y(function(d) { return h-d.sales; })
+											.interpolate('basis');
+											//.interpolate('linear');
+				var viz = svg.append('path')
+				.attr({
+					d: lineFun(monthlySales),
+					'stroke': 'purple',
+					'stroke-width': 2,
+					'fill': 'none'
+				});
+				
+				// Add label
+				var labels = svg.selectAll('text')
+					.data(monthlySales)
+					.enter()
+					.append('text')
+					.text(function(d){ return d.sales })
+					.attr({
+							x: function(d){ return d.month*4-22;},
+							y: function(d){ return h-d.sales-7;},
+							'font-size':'12px',
+							'font-family':'sans-serif',
+							'fill':'#666666',
+							'text-anchor':'start',
+							'dy':'.25em',
+							'font-weight': function(d,i) {
+								if (i===0 || i==(monthlySales.length-1)){
+									return 'bold';}
+								else
+									return 'normal';}
+
+						});
+				
+
+	.row#chart4(style='background:none; text-align:center;')						
+		.col-lg-12
+			h3 Scatter Plot
+			script.
+				var h = 350;
+				// different colors for higher values
+				function salesKPI(d) {
+				  if (d >= 180) { return '#33CC66'; } 
+					else if (d < 180) { return '#666666'; }
+				}
+				// works out min and max
+				function showMinMax(ds,col,val,type){
+				  var max = d3.max(ds, function(d) { return d[col]; });
+				  var min = d3.min(ds, function(d) { return d[col]; });
+
+				  if (type='minmax' && (val == max || val == min)){
+					return val;
+				  } else {
+						if (type=='a'){
+							return val;
+						}
+				  }
+				}
+				var svg =
+					d3.select('#chart4').append('svg')
+					.attr('style','margin: 30px 0px 60px 0px')
+					.attr({
+						width:w,
+						height:h
+					});
+				var dots = svg.selectAll('circle')
+					.data(monthlySales)
+					.enter()
+					.append('circle')
+				.attr({
+				  cx: function(d){ return d.month*3; },
+				  cy: function(d){ return h-d.sales-7;},
+				  r: 5,
+				  'fill': function(d){return salesKPI(d.sales);}
+				});
+				
+				//add labels
+				var labels = svg.selectAll('text')
+					.data(monthlySales)
+					.enter()
+					.append('text')
+					.text(function(d) { return showMinMax(monthlySales,'sales',d.sales,'minmax'); })
+					.attr({
+					  x: function(d){ return (d.month*3)-6; },
+					  y: function(d){ return h - d.sales + 10; },
+					  'font-size': '12px',
+					  'font-family': 'sans-serif',
+					  'fill':'#666666',
+					  'text-anchor': 'start'
+					})
+					 
+										
+				//var border = d3.svg.append('rect').attr('x',0).attr('y',0).
+				//								.attr('height',h).attr('width',w)
+				//								.style('stroke','black').style('fill',none);
+
