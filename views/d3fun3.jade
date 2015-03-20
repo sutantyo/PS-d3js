@@ -10,8 +10,8 @@ block content
 		.col-lg-12		
 			h3 CSV
 			script.
-				var h = 400;
-				var w = 400;
+				var h = 600;
+				var w = 600;
 				var ds; //dataset
 
 				function drawPoints(idTag,ds){
@@ -31,9 +31,11 @@ block content
 							cx: function(ds){ return (ds.longitude-12.40)*5*w; },
 							cy: function(ds){ return (ds.latitude-41.80)*5*h; },
 							r: 1,
-							'fill' : 'black'
-					});
-						
+							'fill' : function(ds){ 
+												var col = ds.id;
+												return 'rgb(' + (col % 256) + ',' + ((col+150) % 256) + ',' + (col % 50) + ')';
+												}
+						});
 				}
 
 				d3.csv('/data/taxi_february_full.csv', function(error,data){
