@@ -4,11 +4,47 @@ block content
 
 	.page-header
 		h1 d3.js Fundamentals 
-			small creating charts
+			small working with data
 
 	.row#chart1(style='background:none; text-align:center;')
 		.col-lg-12		
-			h3 External data sources
+			h3 CSV
+			script.
+				var h = 400;
+				var w = 400;
+				var ds; //dataset
+
+				function drawPoints(idTag,ds){
+					var svg =
+						d3.select('#' + idTag).append('svg')
+						.attr('style','margin: 30px 0px 60px 0px')
+						.attr({
+							width:w,
+							height:h
+						});
+
+					var dots = svg.selectAll('circle')
+						.data(ds)
+						.enter()
+						.append('circle')
+						.attr({
+							cx: function(ds){ return (ds.longitude-12.40)*5*w; },
+							cy: function(ds){ return (ds.latitude-41.80)*5*h; },
+							r: 1,
+							'fill' : 'black'
+					});
+						
+				}
+
+				d3.csv('/data/taxi_february_full.csv', function(error,data){
+					if (error) 
+						console.log("error opening data file" + error);
+					console.log("data loaded");
+					ds = data;	
+					
+					drawPoints('chart1',ds);	
+				});
+
 
 	.row#chart2(style='background:none; text-align:center;')						
 		.col-lg-12		
