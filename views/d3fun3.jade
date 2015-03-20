@@ -7,12 +7,14 @@ block content
 			small working with data
 
 	.row#chart1(style='background:none; text-align:center;')
-		.col-lg-12		
+		.col-lg-9#maploc
 			h3 CSV
 			script.
 				var h = 600;
 				var w = 600;
 				var ds; //dataset
+				var id_cutoff = 40;
+				var active_set = new Set;
 
 				function drawPoints(idTag,ds){
 					var svg =
@@ -20,7 +22,8 @@ block content
 						.attr('style','margin: 30px 0px 60px 0px')
 						.attr({
 							width:w,
-							height:h
+							height:h,
+							'fill':'white'
 						});
 
 					var dots = svg.selectAll('circle')
@@ -28,25 +31,80 @@ block content
 						.enter()
 						.append('circle')
 						.attr({
-							cx: function(ds){ return (ds.longitude-12.40)*5*w; },
-							cy: function(ds){ return (ds.latitude-41.80)*5*h; },
+							cx: function(ds){ 
+								if (ds.id < id_cutoff){
+									return (ds.longitude-12.40)*5*w; 
+								}
+							},
+							cy: function(ds){ 
+								if (ds.id < id_cutoff)
+									return (ds.latitude-41.80)*5*h; },
 							r: 1,
 							'fill' : function(ds){ 
-												var col = ds.id;
-												return 'rgb(' + (col % 256) + ',' + ((col+150) % 256) + ',' + (col % 50) + ')';
+													if (ds.id < id_cutoff){
+														active_set.add(ds.id)
+														var col = ds.id;
+														return 'rgb(' + ((col*89) % 256) + ',' + ((col*57) % 256) + ',' + ((col*17) % 256) + ')';
+														// return 'rgb(' + (col % 256) + ',' + ((col*150) % 256) + ',' + (col % 50) + ')';
+													}
 												}
 						});
-				}
 
+					var active_taxies = new Array;
+					active_set.forEach( function (setItem){
+						active_taxies.push(setItem);
+					});
+
+						// add some information aftewards
+						/*
+					var t = d3.select('#' + idTag).append('div')
+							.attr({
+								'max-width' : '300px'
+							})
+							.append('table')
+							.attr({
+								'class': 'table table-condensed'			
+							});
+							*/
+					var t = d3.select('#table_body');
+					var table_id = t.selectAll('tr')
+									.data(active_taxies).enter()
+									.append('tr').append('td')
+									.text(function(d) {return d;});
+					var table_color = t.selectAll('tr')
+									.append('td')
+									.append('svg')
+									.attr({
+										'height' : 18,
+										'width'  : 45,
+									})
+									.append('rect')
+									.attr({
+										'height' : 18,
+										'width'  : 45,
+										'fill'	 : function(d){ 
+																	return 'rgb(' + ((d*89) % 256) + ',' + ((d*57) % 256) + ',' + ((d*17) % 256) + ')';
+																}
+									})
+
+				}
+			
 				d3.csv('/data/taxi_february_full.csv', function(error,data){
 					if (error) 
 						console.log("error opening data file" + error);
 					console.log("data loaded");
 					ds = data;	
 					
-					drawPoints('chart1',ds);	
+					drawPoints('maploc',ds);	
 				});
 
+		.col-lg-3
+			table(class='table table-condensed', style='table-layout:fixed; width: auto; margin: 100px 0 0 0')
+				thead
+					tr
+						th Taxi No.
+						th Color
+				tbody#table_body
 
 	.row#chart2(style='background:none; text-align:center;')						
 		.col-lg-12		
