@@ -52,12 +52,24 @@ block content
 				});
 
 	.row(style='background:none; text-align:center;')
-		h3 Nested data
+		h3 Scaling
 		.col-lg-9#chart1
+		style.
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+			.axis text{
+				font-family: sans-serif;
+				font-size: 10px;
+			}
 		script.
 
-			var h = 100;
-			var w = 400;
+			var h = 300;
+			var w = 600;
+			var padding = 20;
 			var scale = d3.scale.linear() // also .log(), pow()
 									.domain([130,350]) // max/min of values
 									.range([10,100]);	 // SVG output pixesl
@@ -69,10 +81,11 @@ block content
 						console.log(error);
 					
 					var decodedData = JSON.parse(window.atob(data.content));
-					console.log(decodedData);
-					console.log(decodedData[0]);
-					console.log(decodedData.category);
-					showHeader(decodedData);
+					decodedData.contents.forEach(function(ds){
+						console.log(ds);
+						showHeader(ds);
+						buildLine(ds);
+					});
 
 			});
 
@@ -80,13 +93,62 @@ block content
 				d3.select('#chart1').append('h3')
 						.text(ds.category + ' Sales (2013)');	
 			}
+			function getDate(d){
+				// 20130101
+				var strDate = new String(d);
+				var year = strDate.substring(0,4);
+				var month = strDate.substring(4,2)-1;
+				var day = strDate.substring(6,2);
+				console.log('year:' + year);
+				console.log('month' + month);
+				console.log('day' + day);
+				return new Date(year,month,day);
+			}
 			function buildLine(ds){
+
+				var minDate = getDate(ds.monthlySales[0]['month']);
+				var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
+				console.log('min: ' + minDate + ' max: ' + maxDate);
+				var xScale = d3.time.scale
+											.domain([
+												minDate, 
+												maxDate
+												/*
+												d3.min(ds.monthlySales,function(d){ 
+													console.log(ds.monthlySales);
+													console.log(d.month);
+													return d.month;}),
+												d3.max(ds.monthlySales,function(d){ 
+													console.log(ds.monthlySales);
+													console.log(d.month);
+													return d.month;})
+												*/
+												])
+											.range([padding+5,w-padding]);
+				var yScale = d3.scale.linear()
+											.domain([0, d3.max(ds.monthlySales,function(d){ return d.sales;}) ])
+											.range([h-padding,10]);
+				// Axis
+				var yAxisGen = d3.svg.axis().scale(yScale).orient('left').ticks(4);
+				var xAxisGen = d3.svg.axis().scale(xScale).orient('bottom');
+
 				var lineFun = d3.svg.line()
-					.x(function(d) { return ((d.month-20130001)/3.25); })
-					.y(function(d) { return h-d.sales; })
+					//.x(function(d) { return ((d.month-20130001)/3.25); })
+					.x(function(d) { return xScale(d.month); })
+					//.y(function(d) { return h-d.sales; })
+					.y(function(d) { return yScale(d.sales); })
 					.interpolate('linear');
 
 				var svg = d3.select('#chart1').append('svg').attr({ width:w,height:h });
+
+				// Axis
+				var yAxis = svg.append('g').call(yAxisGen)
+										.attr('class','axis')
+										.attr('transform','translate(' + padding + ',0)')
+				var xAxis = svg.append('g').call(xAxisGen)
+										.attr('class','axis')
+										.attr('transform','translate(0,'+(h-padding) +')')
+
 				var viz = svg.append('path')
 					.attr({
 						d: lineFun(ds.monthlySales),
@@ -95,3 +157,12 @@ block content
 						'fill': 'none'
 					});
 			}
+
+	.row(style='background:none; text-align:center;')
+		h3 Creating an Axis
+		.col-lg-9#chart1
+
+			
+		script.
+
+				
