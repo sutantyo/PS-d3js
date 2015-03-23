@@ -7,13 +7,13 @@ block content
 			small working with data
 
 	.row#chart1(style='background:none; text-align:center;')
+		h3 CSV
 		.col-lg-9#maploc
-			h3 CSV
 			script.
 				var h = 600;
 				var w = 600;
 				var ds; //dataset
-				var id_cutoff = 40;
+				var id_cutoff = 400;
 				var active_set = new Set;
 
 				function drawPoints(idTag,ds){
@@ -55,17 +55,6 @@ block content
 						active_taxies.push(setItem);
 					});
 
-						// add some information aftewards
-						/*
-					var t = d3.select('#' + idTag).append('div')
-							.attr({
-								'max-width' : '300px'
-							})
-							.append('table')
-							.attr({
-								'class': 'table table-condensed'			
-							});
-							*/
 					var t = d3.select('#table_body');
 					var table_id = t.selectAll('tr')
 									.data(active_taxies).enter()
@@ -89,13 +78,20 @@ block content
 
 				}
 			
+				var start = performance.now();
 				d3.csv('/data/taxi_february_full.csv', function(error,data){
 					if (error) 
 						console.log("error opening data file" + error);
 					console.log("data loaded");
 					ds = data;	
-					
+					var end = performance.now();
+					console.log('Execution Time - Harvesting data from csv: ' + ((end-start)/1000).toString()) + ' seconds';
+				
+					start = performance.now();
 					drawPoints('maploc',ds);	
+					end = performance.now();
+					time  = end - start;
+					console.log('Execution Time - Drawing points: ' + ((end-start)/1000).toString()) + ' seconds';
 				});
 
 		.col-lg-3
@@ -106,13 +102,61 @@ block content
 						th Color
 				tbody#table_body
 
-	.row#chart2(style='background:none; text-align:center;')						
-		.col-lg-12		
-			h3 Chart with more features
+	.row(style='background:none; text-align:center;')						
+		h3 JSON
+		.col-lg-12#chart2		
+			script.
+				var loc = '#chart2'
+				var json_ds;
 
-	.row#chart3(style='background:none; text-align:center;')						
-		.col-lg-12
-			h3 Line chart
+				d3.json('/data/all-crime.json', function(error,data){
+					if (error) 
+						console.log("error opening data file" + error);
+					console.log("JSON data loaded");
+					json_ds = data;
+					buildTable();
+				});
+
+				function buildTable()
+				{
+
+
+					var tableHeaders = ["Category","Location","Type","Subtype","Context","Outcome","Date"];
+					var table = d3.select(loc).append('table');
+					table.attr({
+						'class':'table table_condensed',
+					});
+					table.append('tr').selectAll('th').data(tableHeaders).enter()
+								.append('th').text(function(d){return d});
+					var table_rows = table.selectAll('tr').data(json_ds).enter().append('tr');
+					//var table_cell = table_rows.selectAll('td').data(function(d){return d;}).enter()
+					//		.append('td').text(function(d){return d;});
+
+					table_rows.append('td').text(function(d){ return d.category});
+					table_rows.append('td').text(function(d){ return d.name});
+					table_rows.append('td').text(function(d){ return d.location_type});
+
+					/*
+					d3.table.selectAll('tr').selectAll('td')
+						.data(function(d) { 
+							return d; }).enter().append('td')
+						.text(function(d){
+							console.log("Hello");
+							console.log(d);
+							return d;
+						});
+						*/
+				}
+
+	.row(style='background:none; text-align:center;')						
+		h3 Web API
+		.col-lg-12#chart3
+			script.
+				d3.json('http://data.consumerfinance.gov/api/views/x94z-ydhh.json', function(error,data){
+					if (error)
+						console.log("error opening web API data");
+					console.log(data);
+				});
 
 	.row#chart4(style='background:none; text-align:center;')						
 		.col-lg-12

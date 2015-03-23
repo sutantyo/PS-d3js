@@ -1,0 +1,97 @@
+extend layout
+
+block content
+
+	.page-header
+		h1 d3.js Fundamentals 
+			small working with data
+
+	.row(style='background:none; text-align:center;')
+		h3 Nested data
+		.col-lg-9#chart2
+		script.
+			var M = [[1,2,3,4],
+							 [5,6,7,8],
+							 [9,10,11,12]];
+			var regularData = [[40,20,30,24,18,40],
+													[24,20,30,41,12,34]];
+
+			var table = d3.select("#chart2").append('table')
+										.attr({
+											'class': 'table table-condensed'
+										})
+			var rows = table.selectAll('tr')
+				.data(M)
+				.enter().append('tr');
+			var cell = rows
+				.selectAll('td')
+				.data(function(d){ 
+					return d; 
+				}).enter().append('td').text(function(d){return d;});
+
+
+			var myTable = d3.select("#chart2").append("table")
+										.attr({
+											'class': 'table table-condensed'
+										})
+			var myRow = myTable.selectAll('tr')
+				.data(regularData, function(d) {
+					return d;
+				})
+				.enter()
+				.append("tr");
+			var myCell = myRow
+				.selectAll("td")
+				.data(function(d) {
+					return d;
+				})
+				.enter()
+				.append("td") 
+				.text(function(d) {
+					return d;
+				});
+
+	.row(style='background:none; text-align:center;')
+		h3 Nested data
+		.col-lg-9#chart1
+		script.
+
+			var h = 100;
+			var w = 400;
+			var scale = d3.scale.linear() // also .log(), pow()
+									.domain([130,350]) // max/min of values
+									.range([10,100]);	 // SVG output pixesl
+			
+
+			d3.json('https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json', 
+				function(error,data){
+					if (error)
+						console.log(error);
+					
+					var decodedData = JSON.parse(window.atob(data.content));
+					console.log(decodedData);
+					console.log(decodedData[0]);
+					console.log(decodedData.category);
+					showHeader(decodedData);
+
+			});
+
+			function showHeader(ds){
+				d3.select('#chart1').append('h3')
+						.text(ds.category + ' Sales (2013)');	
+			}
+			function buildLine(ds){
+				var lineFun = d3.svg.line()
+					.x(function(d) { return ((d.month-20130001)/3.25); })
+					.y(function(d) { return h-d.sales; })
+					.interpolate('linear');
+
+				var svg = d3.select('#chart1').append('svg').attr({ width:w,height:h });
+				var viz = svg.append('path')
+					.attr({
+						d: lineFun(ds.monthlySales),
+						'stroke': 'purple',
+						'stroke-width': 2,
+						'fill': 'none'
+					});
+			}
