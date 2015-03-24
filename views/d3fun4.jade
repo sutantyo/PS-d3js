@@ -52,7 +52,7 @@ block content
 				});
 
 	.row(style='background:none; text-align:center;')
-		h3 Scaling
+		h3 Scaling and Axis
 		.col-lg-9#chart1
 		style.
 			.axis path,
@@ -65,10 +65,13 @@ block content
 				font-family: sans-serif;
 				font-size: 10px;
 			}
+		p.
+			For more on time formatting, see <a href="https://github.com/mbostock/d3/wiki/Time-Formatting">
+			here</a>
 		script.
 
-			var h = 300;
-			var w = 600;
+			var h = 400;
+			var w = 800;
 			var padding = 20;
 			var scale = d3.scale.linear() // also .log(), pow()
 									.domain([130,350]) // max/min of values
@@ -96,20 +99,20 @@ block content
 			function getDate(d){
 				// 20130101
 				var strDate = new String(d);
-				var year = strDate.substring(0,4);
-				var month = strDate.substring(4,2)-1;
-				var day = strDate.substring(6,2);
-				console.log('year:' + year);
-				console.log('month' + month);
-				console.log('day' + day);
+				var year = strDate.substr(0,4);
+				var month = strDate.substr(4,2)-1;
+				var day = strDate.substr(6,2);
+				//console.log('year: ' + year);
+				//console.log('month: ' + month);
+				//console.log('day: ' + day);
 				return new Date(year,month,day);
 			}
 			function buildLine(ds){
 
 				var minDate = getDate(ds.monthlySales[0]['month']);
 				var maxDate = getDate(ds.monthlySales[ds.monthlySales.length-1]['month']);
-				console.log('min: ' + minDate + ' max: ' + maxDate);
-				var xScale = d3.time.scale
+				//console.log('min: ' + minDate + ' max: ' + maxDate);
+				var xScale = d3.time.scale()
 											.domain([
 												minDate, 
 												maxDate
@@ -130,11 +133,11 @@ block content
 											.range([h-padding,10]);
 				// Axis
 				var yAxisGen = d3.svg.axis().scale(yScale).orient('left').ticks(4);
-				var xAxisGen = d3.svg.axis().scale(xScale).orient('bottom');
+				var xAxisGen = d3.svg.axis().scale(xScale).orient('bottom').tickFormat(d3.time.format('%b'));
 
 				var lineFun = d3.svg.line()
 					//.x(function(d) { return ((d.month-20130001)/3.25); })
-					.x(function(d) { return xScale(d.month); })
+					.x(function(d) { return xScale(getDate(d.month)); })
 					//.y(function(d) { return h-d.sales; })
 					.y(function(d) { return yScale(d.sales); })
 					.interpolate('linear');
@@ -159,10 +162,94 @@ block content
 			}
 
 	.row(style='background:none; text-align:center;')
-		h3 Creating an Axis
-		.col-lg-9#chart1
+		h3 Event listener
+		.col-lg-9#chart3
+			p Show Labels
+				select(id='label-option')
+					option(value='none') None
+					option(value='minmax') Min/Max
+					option(value='all') All
+			script.
+				
+				d3.select('select')
+					.on('change',function(d){
+						console.log('changed');
+						var sel = d3.select('#label-option').node().value; // node gives you the selected function
+						svg.selectAll('text')
+							.data(monthlySales)
+							.text(function(d){ return showMinMax(monthlySales, 'sales', d.sales, sel);
+						});
+					});
+
+				monthlySales = [
+					{'month':10, 'sales':100},
+					{'month':20, 'sales':134},
+					{'month':30, 'sales':250},
+					{'month':40, 'sales':300},
+					{'month':50, 'sales':215},
+					{'month':60, 'sales':222},
+					{'month':70, 'sales':90},
+					{'month':80, 'sales':60},
+					{'month':90, 'sales':235},
+					{'month':100, 'sales':75}
+				];
+				var h = 400;
+				var w = 600;
+				// different colors for higher values
+				function salesKPI(d) {
+				  if (d >= 180) { return '#33CC66'; } 
+					else if (d < 180) { return '#666666'; }
+				}
+				// works out min and max
+				function showMinMax(ds,col,val,type){
+					console.log(type);
+				  var max = d3.max(ds, function(d) { return d[col]; });
+				  var min = d3.min(ds, function(d) { return d[col]; });
+
+				  if (type=='minmax' && (val == max || val == min)){
+						console.log('Branched minmax: ' + val);
+						return val;
+				  } 
+					else {
+						if (type=='all')
+						{
+							console.log('Branched all: ' + val);
+							return val;
+						}
+				  }
+				}
+				var svg =
+					d3.select('#chart3').append('svg')
+					.attr('style','margin: 0px 0px 60px 0px')
+					.attr({
+						width:w,
+						height:h
+					});
+				var dots = svg.selectAll('circle')
+					.data(monthlySales)
+					.enter()
+					.append('circle')
+				.attr({
+				  cx: function(d){ return d.month*3; },
+				  cy: function(d){ return h-d.sales-7;},
+				  r: 5,
+				  'fill': function(d){return salesKPI(d.sales);}
+				});
+				
+				//add labels
+				var labels = svg.selectAll('text')
+					.data(monthlySales)
+					.enter()
+					.append('text')
+					.attr({
+					  x: function(d){ return (d.month*3)-6; },
+					  y: function(d){ return h - d.sales + 10; },
+					  'font-size': '12px',
+					  'font-family': 'sans-serif',
+					  'fill':'#666666',
+					  'text-anchor': 'start'
+					})
 
 			
-		script.
 
 				
