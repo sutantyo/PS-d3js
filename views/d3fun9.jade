@@ -1,0 +1,133 @@
+extend layout
+
+block additional_header
+		script(src='https://maps.google.com/maps/api/js?sensor=true', type='text/javascript')
+block content
+
+	style(type='text/css').
+		html,body,#drawspace {
+			width: 100%;
+			height: 90%;
+			margin: 0;
+			padding: 0 20px 0 30px;
+		}
+		.marker, .boundaries {
+			position: absolute;
+		}
+	.page-header
+			h2 d3.js Google Maps custom overlay
+
+	#drawspace
+
+	script.
+
+		boundary_points = [ {id : 'NW', x: 37.99999, y: -122.56000},
+											  {id : 'NE', x: 37.99999, y: -122.00000},
+											  {id : 'SE', x: 37.20000, y: -122.00000},
+											  {id : 'SW', x: 37.20000, y: -122.56000} ];
+
+		data = [{id : 1, x : 37.77669, y : -122.39382},
+						{id : 2, x : 37.76798, y : -122.40589},
+						{id : 3, x : 37.82443, y : -122.30938},
+						{id : 4, x : 37.78237, y : -122.42427},
+						{id : 5, x : 37.76879, y : -122.41991}];
+
+
+		var map = new google.maps.Map(d3.select("#drawspace").node(), {
+			zoom: 10,
+			center: new google.maps.LatLng(37.7833,-122.4167),
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		});
+		var styles = [ {stylers: [{ hue: '#e0dce8' }, { saturation: -60 }, { lightness: 60}] }];
+		map.setOptions({styles: styles});
+
+		OverlayView.prototype = new google.maps.OverlayView();
+		var overlay = new OverlayView();
+
+		overlay.setMap(map);
+
+		setTimeout(function(){
+			//overlay.update()
+			},500);
+		function OverlayView()
+		{
+			var _projection;
+			var _main_layer;
+			var _main_svg;
+
+			this.onAdd = function() {
+				console.log('called onAdd');
+				_main_layer = d3.select(this.getPanes().overlayLayer).append('div').attr('id','main-layer');
+				_main_svg = _main_layer.append('svg')
+					.attr({
+						'class':'boundaries'
+						})
+				_main_svg.append('rect')
+					.attr({
+						'height':'100%',
+						'width':'100%',
+						'fill':'red',
+						'opacity':'.1'
+					})
+			};
+
+			this.onRemove = function() {
+				_main_layer.remove();
+			};
+
+			this.update = function(){
+				console.log('called update');
+				var points = _main_layer.selectAll('svg.boundaries').data(boundary_points)
+				
+				console.log(points);	
+				console.log(points.enter());	
+				points.enter().append('svg')
+					.attr({
+						'height': '5px',
+						'width': '5px',
+						'class': 'boundaries'
+					})
+
+				_main_layer.selectAll('svg.boundaries')	
+					.style('left',function(d){return transformCoord(d).x + 'px'})	
+					.style('top',function(d){return transformCoord(d).y + 'px'})	
+					.append('rect')
+					.attr({
+						'height':'5px',
+						'width':'5px',
+						'fill':'black'
+					});
+
+				_main_svg
+					.style('left', transformCoord(boundary_points[0]).x + 'px')
+					.style('top', transformCoord(boundary_points[0]).y + 'px')
+					.attr({
+						'height': distanceInPixels(boundary_points[0],boundary_points[3]),
+						'width': distanceInPixels(boundary_points[0],boundary_points[1])
+						})
+				
+			}; // end this.update
+
+
+			this.draw = function() {
+				console.log('called draw');
+				_projection = this.getProjection();
+				this.update();
+			};
+
+
+			function transformCoord(d){
+				var LatLng = new google.maps.LatLng(d.x,d.y);
+				var position = _projection.fromLatLngToDivPixel(LatLng);
+				return position;
+			};
+
+			function distanceInPixels(d1,d2){
+				d1 = transformCoord(d1);
+				d2 = transformCoord(d2);
+				var distance = Math.sqrt((d2.x-d1.x)*(d2.x-d1.x)+(d2.y-d1.y)*(d2.y-d1.y));
+				return distance;
+			};
+
+		}
+

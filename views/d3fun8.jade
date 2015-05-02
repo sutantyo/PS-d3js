@@ -1,0 +1,203 @@
+extend layout
+block content
+
+	style(type='text/css').
+		.centeredSVG {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			margin-top: 60px;
+			margin-bottom: 50px;
+			text-align: center;
+			height: 150px;
+			width: 500px;
+		}
+		.textForSVG{
+		}
+
+		.lineSVG{
+			stroke: black;
+			stroke-width: 1.5pt;
+			fill: none;
+		}
+		
+
+	.container
+		.page-header
+				h2 d3.js Path transition
+
+		p. 
+			Source: <a href="http://bost.ocks.org/mike/path/">http://bost.ocks.org/mike/path/</a>
+
+		#drawspace
+
+
+	script.
+
+		var simpleline = d3.select('#drawspace').append('svg')
+			.classed('simple-line',true)
+			.classed('centeredSVG',true)
+
+		simpleline.append('path').attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+			.classed('lineSVG',true);
+		simpleline.append('text').text('Static Line')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+
+		var movingLine = d3.select('#drawspace').append('svg')
+			.classed('centeredSVG',true)
+
+		movingLine.append('path')
+			.attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+			.classed('lineSVG',true);
+		movingLine.append('text').text('Moving the y-coords')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+
+		var movingLine2 = d3.select('#drawspace').append('svg')
+			.classed('centeredSVG',true)
+
+		movingLine2.append('path')
+			.attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+			.classed('lineSVG',true);
+		movingLine2.append('text').text('Moving the x-coords')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+
+		var movingLine3 = d3.select('#drawspace').append('svg')
+			.classed('centeredSVG',true)
+
+		movingLine3.append('path')
+			.attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+			.classed('lineSVG',true);
+		movingLine3.append('text').text('Moving both coords')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+
+		var lineFunction = d3.svg.line()
+					.x(function(d) {return d.x;})
+					.y(function(d) {return d.y;})
+					.interpolate('linear');
+
+		var movingLine4 = d3.select('#drawspace').append('svg')
+			.classed('centeredSVG',true)
+		var lineData1 = [{x:20,y:80},{x:70,y:20},{x:120,y:80},{x:170,y:40},{x:220,y:60},{x:270,y:60}];
+		movingLine4.append('path')
+			.attr('d',lineFunction(lineData1))
+			.classed('lineSVG',true);
+		movingLine4.append('text').text('Disappearing on the left (wiggly)')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+
+		var movingLine5 = d3.select('#drawspace').append('svg')
+			.classed('centeredSVG',true)
+		var lineData2 = [{x:20,y:80},{x:70,y:20},{x:120,y:80},{x:170,y:40},{x:220,y:60},{x:270,y:60}];
+		movingLine5.append('path')
+			.attr('d',lineFunction(lineData2))
+			.classed('lineSVG',true);
+		movingLine5.append('text').text('Disappearing on the left (non-wiggly)')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+
+		var movingLine6 = d3.select('#drawspace').append('svg')
+			.classed('centeredSVG',true)
+		var lineData3 = [{x:150,y:20},{x:90,y:100}];
+		var lineData4 = [{x:270,y:40},{x:290,y:100}];
+		movingLine6.append('path')
+			.attr('d',lineFunction(lineData3))
+			.classed('lineSVG',true);
+		movingLine6.append('text').text('Ping Pong')
+			.classed('textForSVG',true)
+			.attr({
+				'x' : 180,
+				'y' : 140,
+				'font-size' : 18
+			});
+		loop();
+
+		function loop()
+		{
+			movingLine.select('path')
+				.transition()
+				.duration(1000)
+				.attr('d','M20,20 L 70,80 L 120,20 L 170,40 L 220,80 L 270,60 ')
+				.transition()
+				.duration(1000)
+				.attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+
+			movingLine2.select('path')
+				.transition()
+				.duration(1000)
+				.attr('d','M120,80 L 170,20 L 220,80 L 270,40 L 320,60 L 370,60 ')
+				.transition()
+				.duration(1000)
+				.attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+
+			movingLine3.select('path')
+				.transition()
+				.duration(1000)
+				.attr('d','M170,10 L 50,90 L 30,60 L 120,90 L 120,20 L 280,60 ')
+				.transition()
+				.duration(1000)
+				.attr('d','M20,80 L 70,20 L 120,80 L 170,40 L 220,60 L 270,60 ')
+
+			var first1 = lineData1.shift();		
+			lineData1.forEach(function(coord){
+				coord.x = coord.x-50;
+			});
+			first1.x = first1.x+250;
+			lineData1.push(first1);
+			movingLine4.select('path')
+				.transition()
+				.duration(2000)
+				.attr('d',lineFunction(lineData1))
+
+			var toInsert = {x:(lineData2[0].x + 300), y:lineData2[0].y};			
+			lineData2.push(toInsert);
+			movingLine5.select('path')
+				.attr('transform',null)
+				.attr('d',lineFunction(lineData2))
+				.transition()
+				.attr('transform','translate(-50)');
+
+			lineData2.shift();
+			lineData2.forEach(function(coord){
+				coord.x = coord.x-50;
+			});
+
+			movingLine6.select('path')
+				.transition()
+				.duration(1000)
+				.attr('d',lineFunction(lineData4))
+				.transition()
+				.duration(1000)
+				.attr('d',lineFunction(lineData3))
+
+
+			setTimeout(function(){loop()},2000);
+	
+		}

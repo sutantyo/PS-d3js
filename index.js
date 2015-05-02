@@ -7,7 +7,7 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.set('port',(process.env.PORT || 5000));
+app.set('port',(process.env.PORT || 5050));
 
 app.use(express.static(__dirname + '/public'));
 // this is used to server files in public directory

@@ -1,0 +1,71 @@
+extend layout
+
+block additional_header
+		script(src='https://maps.google.com/maps/api/js?sensor=true', type='text/javascript')
+block content
+
+	style(type='text/css').
+		html,body,#drawspace {
+			width: 100%;
+			height: 90%;
+			margin: 0;
+			padding: 0 20px 0 30px;
+		}
+	.page-header
+			h2 d3.js Rectangle vs lines
+
+	#drawspace
+
+	script.
+
+		var svg = d3.select('#drawspace').append('svg')
+			.attr({
+				'height' : 300,
+				'width'  : 640
+				});
+
+		svg.append('rect')
+			.attr({
+				'x' : 50,
+				'y' : 200,
+				'height' : 100,
+				'width' : 1,
+				'fill' : 'red'
+			})
+
+		svg.append('path')
+			.attr('d','M 50.5,200 L 50.5,100')
+			.attr('fill','none')
+			.style('stroke-width','1')
+			.style('stroke','red')
+
+		svg.append('path')
+			.attr('d','M 100.5,200 L 100.5,160')
+			.attr('fill','none')
+			.style('stroke-width','1')
+			.style('stroke','red')
+
+		svg.append('path')
+			.attr('d','M 80,200 L 80,160')
+			.attr('fill','none')
+			.style('stroke-width','1')
+			.style('stroke','red')
+
+		svg.append('path')
+			.attr('d','M 100.5,200 L 100.5,160')
+			.attr('fill','none')
+			.style('stroke-width','1')
+			.style('stroke','red')
+
+
+		svg.append('path')
+			.attr('d','M 150,200 L 151,260 L 152,273 L 153,210 L 154,280')
+			.attr('fill','none')
+			.style('stroke-width','1')
+			.style('stroke','red')
+
+		svg.append('path')
+			.attr('d','M 150.5,200 L 151.5,260 L 152.5,273 L 153.5,210 L 154.5,280')
+			.attr('fill','none')
+			.style('stroke-width','1')
+			.style('stroke','red')
